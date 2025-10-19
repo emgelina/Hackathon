@@ -25,38 +25,64 @@ body {
   min-height: 100vh;
 }
 
-.welcome-card {
+/* ---------- Card ---------- */
+.signin-card {
   background: var(--white);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 40px 48px;
-  max-width: 520px;
+  padding: 40px;
+  width: 360px;
   text-align: center;
   animation: fadeIn 0.5s ease;
 }
 
 h1 {
   color: var(--purple);
-  font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
-.tagline {
-  font-size: 1rem;
+/* ---------- Form ---------- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  text-align: left;
+}
+
+.input-group label {
+  font-weight: 600;
   color: var(--grey);
-  margin-bottom: 32px;
-  line-height: 1.6;
+  margin-bottom: 6px;
+  display: block;
 }
 
+.input-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background: #fafafa;
+}
+
+.input-group input:focus {
+  outline: 2px solid var(--purple-light);
+  background: #fff;
+}
+
+/* ---------- Button ---------- */
 .btn-primary {
-  display: inline-block;
+  display: block;
+  width: 100%;
   text-decoration: none;
   background: linear-gradient(135deg, var(--purple), var(--purple-light));
   color: white;
-  padding: 12px 28px;
+  padding: 12px 20px;
+  border: none;
   border-radius: var(--radius);
   font-weight: 600;
-  box-shadow: var(--shadow);
+  cursor: pointer;
+  margin-top: 8px;
 }
 
 .btn-primary:hover {
@@ -64,24 +90,31 @@ h1 {
   opacity: 0.9;
 }
 
-.btn-primary:active {
-  transform: translateY(1px);
+/* ---------- Footer ---------- */
+.small {
+  font-size: 0.9rem;
+  margin-top: 20px;
 }
 
+.small a {
+  color: var(--purple);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.small a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Animation ---------- */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 600px) {
-  .welcome-card {
-    padding: 28px 24px;
+@media (max-width: 500px) {
+  .signin-card {
     width: 90%;
-  }
-  h1 {
-    font-size: 1.5rem;
-  }
-  .tagline {
-    font-size: 0.95rem;
+    padding: 24px;
   }
 }
