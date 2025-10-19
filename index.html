@@ -1,10 +1,9 @@
-```html
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Image Upload — Demo</title>
+  <title>Food Allergen Identifier</title>
   <style>
     :root{
       --bg:#f6f8fb;
@@ -101,7 +100,19 @@
     }
     .meta{ color:var(--muted); font-size:0.92rem; text-align:center; }
     .small{ font-size:0.86rem; color:var(--muted) }
-
+    .result-box {
+      border-top: 1px solid rgba(11,18,32,0.06);
+      padding-top: 12px;
+      font-size: 0.95rem;
+    }
+    pre {
+      background: #f6f8fa;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
     @media (max-width:720px){
       .uploader{ flex-direction:column; align-items:stretch; }
       .preview{ width:100%; }
@@ -112,8 +123,8 @@
 <body>
   <main class="card" role="main" aria-labelledby="pageTitle">
     <div>
-      <h1 id="pageTitle">Image Upload</h1>
-      <p class="lead">Select or drop a single image. This demo previews the chosen image in the browser.</p>
+      <h1 id="pageTitle">Food Allergen Identifier</h1>
+      <p class="lead">Upload an image of food to identify its base ingredients and possible allergens.</p>
     </div>
 
     <section class="uploader" aria-labelledby="uploadLabel">
@@ -123,10 +134,10 @@
         role="button"
         tabindex="0"
         aria-label="Drop image here or click to select"
-        >
+      >
         <input id="fileInput" type="file" accept="image/*" aria-label="Choose an image file" />
         <div style="font-weight:700">Drop an image here or click to choose</div>
-        <div class="small">Supported: JPG, PNG, HEIC (browser support varies). Max 10 MB recommended.</div>
+        <div class="small">Supported: JPG, PNG, HEIC (Max 10 MB).</div>
       </div>
 
       <div class="preview" aria-live="polite">
@@ -134,28 +145,37 @@
         <div class="meta" id="metaText">No image selected</div>
         <div style="display:flex;gap:8px;">
           <button id="clearBtn" class="btn-ghost" type="button" disabled>Clear</button>
-          <button id="uploadBtn" type="button" disabled>Submit (demo)</button>
+          <button id="uploadBtn" type="button" disabled>Analyze</button>
         </div>
       </div>
     </section>
 
+    <div class="result-box" id="results" hidden>
+      <h3>Results</h3>
+      <p><strong>Ingredients:</strong></p>
+      <pre id="ingredientsBox"></pre>
+      <p><strong>Possible Allergens:</strong></p>
+      <pre id="allergensBox"></pre>
+    </div>
+
     <div class="small">
-      This page only handles the client-side selection and preview of an image. It does not upload files to any server by default.
+      This page runs entirely in your browser and sends the image to a local backend for analysis.
     </div>
   </main>
 
   <script>
-    // Elements
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('fileInput');
     const previewImg = document.getElementById('previewImg');
     const metaText = document.getElementById('metaText');
     const clearBtn = document.getElementById('clearBtn');
     const uploadBtn = document.getElementById('uploadBtn');
+    const results = document.getElementById('results');
+    const ingredientsBox = document.getElementById('ingredientsBox');
+    const allergensBox = document.getElementById('allergensBox');
 
     let currentFile = null;
 
-    // Helpers
     function reset() {
       currentFile = null;
       previewImg.src = '';
@@ -164,6 +184,7 @@
       clearBtn.disabled = true;
       uploadBtn.disabled = true;
       fileInput.value = '';
+      results.hidden = true;
     }
 
     function humanFileSize(bytes) {
@@ -176,95 +197,91 @@
       return b.toFixed(1) + ' ' + units[u];
     }
 
-    // File handling
     async function handleFile(file) {
       if (!file) return;
       if (!file.type.startsWith('image/')) {
         alert('Please select an image file.');
         return reset();
       }
-      // Optional size guard (example: 20 MB)
-      const MAX_BYTES = 20 * 1024 * 1024;
+      const MAX_BYTES = 10 * 1024 * 1024;
       if (file.size > MAX_BYTES) {
-        const ok = confirm('This file is large (' + humanFileSize(file.size) + '). Continue?');
-        if (!ok) return reset();
+        alert('File too large (max 10 MB).');
+        return reset();
       }
 
       currentFile = file;
       metaText.textContent = `${file.name} — ${humanFileSize(file.size)}`;
-
-      // Create object URL for preview
       const url = URL.createObjectURL(file);
       previewImg.src = url;
       previewImg.hidden = false;
       clearBtn.disabled = false;
       uploadBtn.disabled = false;
-
-      // Revoke object URL after image loads to free memory
-      previewImg.onload = () => {
-        try { URL.revokeObjectURL(url); } catch(e) {}
-      };
+      previewImg.onload = () => URL.revokeObjectURL(url);
     }
 
-    // Drag & drop UX
     ['dragenter','dragover'].forEach(evt =>
-      dropzone.addEventListener(evt, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropzone.classList.add('dragover');
+      dropzone.addEventListener(evt, e => {
+        e.preventDefault(); e.stopPropagation(); dropzone.classList.add('dragover');
       })
     );
     ['dragleave','drop'].forEach(evt =>
-      dropzone.addEventListener(evt, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropzone.classList.remove('dragover');
+      dropzone.addEventListener(evt, e => {
+        e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dragover');
       })
     );
 
-    dropzone.addEventListener('drop', (e) => {
+    dropzone.addEventListener('drop', e => {
       const dt = e.dataTransfer;
-      if (!dt || !dt.files || !dt.files.length) return;
-      handleFile(dt.files[0]);
+      if (dt && dt.files && dt.files[0]) handleFile(dt.files[0]);
     });
 
-    // Click / keyboard to open file picker
     dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('keypress', (e) => {
+    dropzone.addEventListener('keypress', e => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
     });
-
     fileInput.addEventListener('change', () => {
       if (fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]);
     });
+    clearBtn.addEventListener('click', reset);
 
-    clearBtn.addEventListener('click', () => {
-      reset();
-    });
-
-    // Demo "submit" - by default doesn't send to server.
     uploadBtn.addEventListener('click', async () => {
       if (!currentFile) return;
-      // Example: show file info and a Base64 preview in console (for integration)
-      metaText.textContent = 'Preparing file...';
+      metaText.textContent = 'Uploading...';
+      uploadBtn.disabled = true;
+
       const reader = new FileReader();
-      reader.onload = () => {
-        console.log('File name:', currentFile.name);
-        console.log('File size:', currentFile.size);
-        console.log('Data URL length:', reader.result.length);
-        metaText.textContent = 'Ready — demo submission logged to console.';
-        alert('Demo: image data logged to the browser console. Integrate a server call (fetch / XHR) to send the file.');
+      reader.onload = async () => {
+        const base64Data = reader.result;
+
+        try {
+          const response = await fetch('http://127.0.0.1:5000/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64Data })
+          });
+
+          const result = await response.json();
+          if (result.error) {
+            alert('Error: ' + result.error);
+            metaText.textContent = 'Upload failed.';
+          } else {
+            results.hidden = false;
+            ingredientsBox.textContent = result.ingredients;
+            allergensBox.textContent = result.allergens;
+            metaText.textContent = 'Analysis complete.';
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Failed to connect to backend.');
+          metaText.textContent = 'Error sending to server.';
+        } finally {
+          uploadBtn.disabled = false;
+        }
       };
-      reader.onerror = () => {
-        metaText.textContent = 'Failed to read file.';
-      };
-      // Read as data URL (use readAsArrayBuffer for other workflows)
       reader.readAsDataURL(currentFile);
     });
 
-    // initialize
     reset();
   </script>
 </body>
 </html>
-```
