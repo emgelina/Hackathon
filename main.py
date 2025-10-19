@@ -158,17 +158,6 @@ HTML_PAGE = """
       content: ' .';
       animation: dots 1s steps(3, end) infinite;
     }
-    .btn-primary {
-      display: inline-block;
-      text-decoration: none;
-      text-align: center;
-      background: linear-gradient(135deg, #7c3aed, #a78bfa);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 14px;
-      font-weight: 600;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    }
     @keyframes dots { 0%{content:''} 33%{content:'.'} 66%{content:'..'} 100%{content:'...'} }
 
     /* Powered by Gemini badge */
@@ -321,10 +310,6 @@ HTML_PAGE = """
       }
     });
   </script>
-  <p style="text-align:center; margin-top:20px;">
-  <a href="account.html" class="btn-primary">View My Account</a>
-  </p>
-
 </body>
 </html>
 """
