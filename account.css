@@ -1,0 +1,106 @@
+:root {
+  --purple: #7c3aed;
+  --purple-light: #a78bfa;
+  --grey: #6b7280;
+  --light-grey: #f6f8fb;
+  --white: #ffffff;
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  --radius: 14px;
+  --font: "Inter", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--light-grey);
+  color: var(--grey);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.account-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 40px;
+  width: 400px;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+h1 {
+  color: var(--purple);
+  margin-bottom: 30px;
+}
+
+/* Info fields */
+.info-group {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.info-group label {
+  display: block;
+  font-weight: 600;
+  color: var(--grey);
+  margin-bottom: 8px;
+}
+
+.info-box {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  padding: 12px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.info-box:hover {
+  border-color: var(--purple-light);
+}
+
+/* Buttons */
+.button-group {
+  margin-top: 30px;
+}
+
+.btn-primary {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+  background: linear-gradient(135deg, var(--purple), var(--purple-light));
+  color: white;
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 500px) {
+  .account-card {
+    width: 90%;
+    padding: 24px;
+  }
+}
